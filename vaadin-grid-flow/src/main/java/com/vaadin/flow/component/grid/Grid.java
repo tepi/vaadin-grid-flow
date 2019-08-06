@@ -3664,4 +3664,9 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
 
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Registration addColumnReorderListener(ComponentEventListener<ColumnReorderEvent<Grid<T>>> listener) {
+        return addListener(ColumnReorderEvent.class, (ComponentEventListener) listener);
+    }
+
 }

@@ -69,6 +69,17 @@ interface ColumnBase<T extends ColumnBase<T>> extends HasElement {
         return (T) this;
     }
 
+    @Synchronize("_order-changed")
+    default int getOrder() {
+        return getElement().getProperty("_order", 0);
+    }
+
+    @SuppressWarnings("unchecked")
+    default T setOrder(int order) {
+        getElement().setProperty("_order", order);
+        return (T) this;
+    }
+
     /**
      * Gets the this column's frozen state.
      *
@@ -78,7 +89,6 @@ interface ColumnBase<T extends ColumnBase<T>> extends HasElement {
     default boolean isFrozen() {
         return getElement().getProperty("frozen", false);
     }
-
     /**
      * Sets the column text align.
      * 

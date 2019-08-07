@@ -2612,16 +2612,13 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
      * Gets an unmodifiable list of all {@link Column}s currently in this
      * {@link Grid}.
      * <p>
-     * <strong>Note:</strong> If column reordering is enabled with
-     * {@link #setColumnReorderingAllowed(boolean)} and the user has reordered
-     * the columns, the order of the list returned by this method might not be
-     * correct.
      *
      * @return unmodifiable list of columns
      */
     public List<Column<T>> getColumns() {
         List<Column<T>> ret = new ArrayList<>();
         getTopLevelColumns().forEach(column -> appendChildColumns(ret, column));
+        ret.sort(Comparator.comparingInt(ColumnBase::getOrder));
         return Collections.unmodifiableList(ret);
     }
 
@@ -3665,8 +3662,52 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Registration addColumnReorderListener(ComponentEventListener<ColumnReorderEvent<Grid<T>>> listener) {
+    public Registration addColumnReorderListener(ComponentEventListener<ColumnReorderEvent<T>> listener) {
         return addListener(ColumnReorderEvent.class, (ComponentEventListener) listener);
     }
 
+
+
+    /**
+     * Sets a new column order for the grid. All columns which are not ordered
+     * here will remain in the order they were before as the last columns of
+     * grid.
+     *
+     * @param columns
+     *            the columns in the order they should be
+     */
+    public void setColumnOrder(Column<T>... columns) {
+        int order = 1;
+        for (Column<T> column : columns) {
+            column.setOrder(order);
+            order++;
+        }
+        fireColumnReorderEvent(false);
+    }
+
+    private void setColumnOrder(Stream<Column<T>> columns) {
+        int order = 1;
+        for (Column<T> column : columns.collect(Collectors.toList())) {
+            column.setOrder(order*1000);
+            order++;
+        }
+        fireColumnReorderEvent(false);
+    }
+    /**
+     * Sets a new column order for the grid based on their column ids. All
+     * columns which are not ordered here will remain in the order they were
+     * before as the last columns of grid.
+     *
+     * @param keys
+     *            the column ids in the order they should be
+     *
+     * @see Column#setKey(String)
+     */
+    public void setColumnOrder(String... keys) {
+        setColumnOrder(Stream.of(keys).map(this::getColumnByKey));
+    }
+
+    private void fireColumnReorderEvent(boolean userOriginated) {
+        fireEvent(new ColumnReorderEvent<T>(this, userOriginated));
+    }
 }

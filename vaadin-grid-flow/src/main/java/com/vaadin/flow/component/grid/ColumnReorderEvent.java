@@ -24,11 +24,8 @@ import elemental.json.JsonValue;
 @DomEvent("column-reorder")
 public class ColumnReorderEvent<T> extends ComponentEvent<Grid<T>> {
 
-    public ColumnReorderEvent(Grid<T> source, boolean fromClient/*,
-                              @EventData("event.detail.columns") JsonValue columns*/) {
+    public ColumnReorderEvent(Grid<T> source, boolean fromClient) {
         super(source, fromClient);
-    //    source.getColumns().forEach(c -> System.out.println(c.getInternalId()));
-        source.getColumns().forEach(c -> System.out.println(c.getKey()));
     }
 
 }

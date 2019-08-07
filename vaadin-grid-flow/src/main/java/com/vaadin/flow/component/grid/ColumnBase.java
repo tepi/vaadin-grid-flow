@@ -69,7 +69,7 @@ interface ColumnBase<T extends ColumnBase<T>> extends HasElement {
         return (T) this;
     }
 
-    @Synchronize("_order-changed")
+    @Synchronize(property = "_order", value = "_order-changed")
     default int getOrder() {
         return getElement().getProperty("_order", 0);
     }

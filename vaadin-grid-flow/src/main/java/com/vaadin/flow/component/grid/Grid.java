@@ -3677,21 +3677,36 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
      *            the columns in the order they should be
      */
     public void setColumnOrder(Column<T>... columns) {
-        setColumnOrder(Stream.of(columns));
+        setColumnOrder(Arrays.asList(columns));
     }
 
-    //// TODO We can set the column order using column.setOrder
-    //// But it won't trigger the event
-    //// This method does not work if we use it when the grid is added
-    //// Tried to postpone this, but does not help
-    private void setColumnOrder(Stream<Column<T>> columns) {
-        int order = 1;
-        for (Column<T> column : columns.collect(Collectors.toList())) {
-            column.setOrder(order*1000);
-            order++;
+    /**
+     * Swap order between columns
+     *
+     * @param columns
+     */
+    private void setColumnOrder(List<Column<T>> columns) {
+        if (columns == null || columns.isEmpty()){
+            // does nothing if nothing to reorder
+            return;
+        }
+        // check if all the columns are in the same group
+        List<Integer> columnsOrder = new ArrayList<>(columns.size());
+        Component parent = columns.get(0).getParent().get();
+        for (Column<T> column : columns) {
+            if (!parent.equals(column.getParent().get())) {
+                throw new IllegalStateException("Cannot change the order of columns from different group");
+            }
+            columnsOrder.add(column.getOrder());
+        }
+        Collections.sort(columnsOrder);
+
+        for (int i = 0; i < columns.size(); i++) {
+            columns.get(i).setOrder(columnsOrder.get(i));
         }
         fireColumnReorderEvent(false);
     }
+
     /*
     private void orderColumn(Column<T> column, int order) {
         column.getElement().getNode().runWhenAttached(
@@ -3710,7 +3725,7 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
      * @see Column#setKey(String)
      */
     public void setColumnOrder(String... keys) {
-        setColumnOrder(Stream.of(keys).map(this::getColumnByKey));
+        setColumnOrder(Stream.of(keys).map(this::getColumnByKey).collect(Collectors.toList()));
     }
 
     private void fireColumnReorderEvent(boolean userOriginated) {

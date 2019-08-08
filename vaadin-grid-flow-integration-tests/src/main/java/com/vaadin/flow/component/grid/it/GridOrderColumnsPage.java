@@ -66,7 +66,7 @@ public class GridOrderColumnsPage extends VerticalLayout
         Button orderCol31Button = new Button("order only the columns 3 and 1 ",e -> {
             grid.setColumnOrder(column3,column1);
         });
-        orderCol321Button.setId("button-31");
+        orderCol31Button.setId("button-31");
         add(new HorizontalLayout(orderCol123Button, orderCol321Button, orderCol31Button, columnKeysInOrder));
 
 

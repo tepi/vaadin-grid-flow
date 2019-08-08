@@ -157,11 +157,6 @@ public class GridHeaderFooterRowPage extends Div {
             b.setId("join-footers-" + i + (i + 1));
             add(b);
         });
-
-        grid2.addColumnReorderListener(e ->
-                        System.out.println(grid.getColumns().stream().map(stringColumn -> stringColumn.toString()).reduce(String::concat).orElse(""))
-        );
-        grid2.setColumnReorderingAllowed(true);
     }
 
 }

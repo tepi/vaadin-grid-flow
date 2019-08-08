@@ -2611,7 +2611,6 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
     /**
      * Gets an unmodifiable list of all {@link Column}s currently in this
      * {@link Grid}.
-     * <p>
      *
      * @return unmodifiable list of columns
      */
@@ -3661,12 +3660,19 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
 
     }
 
+    /**
+     * Adds a column reorder listener to this component.
+     *
+     * @param listener
+     *            the listener to add, not <code>null</code>
+     * @return a handle that can be used for removing the listener
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Registration addColumnReorderListener(ComponentEventListener<ColumnReorderEvent<T>> listener) {
-        return addListener(ColumnReorderEvent.class, (ComponentEventListener) listener);
+    public Registration addColumnReorderListener(
+            ComponentEventListener<ColumnReorderEvent<T>> listener) {
+        return addListener(ColumnReorderEvent.class,
+                (ComponentEventListener) Objects.requireNonNull(listener));
     }
-
-
 
     /**
      * Sets a new column order for the grid. All columns which are not ordered
@@ -3695,7 +3701,8 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
         Component parent = columns.get(0).getParent().get();
         for (Column<T> column : columns) {
             if (!parent.equals(column.getParent().get())) {
-                throw new IllegalStateException("Cannot change the order of columns from different group");
+                throw new IllegalStateException("Cannot change the order of " +
+                        "columns from different group");
             }
             columnsOrder.add(column.getOrder());
         }
@@ -3718,10 +3725,11 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
      * @see Column#setKey(String)
      */
     public void setColumnOrder(String... keys) {
-        setColumnOrder(Stream.of(keys).map(this::getColumnByKey).collect(Collectors.toList()));
+        setColumnOrder(Stream.of(keys).map(this::getColumnByKey)
+                .collect(Collectors.toList()));
     }
 
     private void fireColumnReorderEvent(boolean userOriginated) {
-        fireEvent(new ColumnReorderEvent<T>(this, userOriginated));
+        fireEvent(new ColumnReorderEvent<>(this, userOriginated));
     }
 }

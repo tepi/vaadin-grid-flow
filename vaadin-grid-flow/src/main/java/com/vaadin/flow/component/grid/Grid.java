@@ -3707,13 +3707,6 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
         fireColumnReorderEvent(false);
     }
 
-    /*
-    private void orderColumn(Column<T> column, int order) {
-        column.getElement().getNode().runWhenAttached(
-                ui -> ui.beforeClientResponse(this, context -> {
-                    column.setOrder(order);
-                }));
-    }*/
     /**
      * Sets a new column order for the grid based on their column ids. All
      * columns which are not ordered here will remain in the order they were

@@ -119,11 +119,9 @@ public class GridOrderColumnsPage extends VerticalLayout
         // |     H012     |   H34   | H5 |
         // | H0 | H1 | H2 | H3 | H4 | H5 |
 
-
         grid.setColumnReorderingAllowed(true);
 
         grid.addColumnReorderListener(e -> {
-            System.out.println("columnReordered");
             groupColumnKeysInOrder.removeAll();
             groupColumnKeysInOrder.add(grid.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
         });

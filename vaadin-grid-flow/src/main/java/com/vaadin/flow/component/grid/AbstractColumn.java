@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Synchronize;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -269,6 +270,29 @@ abstract class AbstractColumn<T extends AbstractColumn<T>> extends Component
                                 .getBottomChildColumns().stream())
                         .collect(Collectors.toList()));
         return columnChildren;
+    }
+
+
+    /**
+     * Gets this column's order.
+     *
+     * @return order of the column
+     */
+    @Synchronize(property = "_order", value = "_order-changed")
+    protected int getOrder() {
+        return getElement().getProperty("_order", 0);
+    }
+
+    /**
+     * Sets the column order
+     *
+     * @param order new order of the column
+     * @return this column, for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    protected T setOrder(int order) {
+        getElement().setProperty("_order", order);
+        return (T) this;
     }
 
 }

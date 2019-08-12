@@ -45,13 +45,13 @@ public class GridOrderColumnsPage extends VerticalLayout
 
         columnKeysInOrder.setId("column-keys-in-order");
 
-        columnKeysInOrder.add(grid.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
+        grid.setColumnOrder(column3,column1);
 
-    //    grid.setColumnOrder(column1,column2,column3);
+        columnKeysInOrder.add(grid.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
 
         grid.addColumnReorderListener(e -> {
             columnKeysInOrder.removeAll();
-            columnKeysInOrder.add(grid.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
+            columnKeysInOrder.add(e.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
         });
 
         Button orderCol123Button = new Button("Col 1 2 3 ",e -> {
@@ -86,7 +86,7 @@ public class GridOrderColumnsPage extends VerticalLayout
 
         grid.addColumnReorderListener(e -> {
             groupColumnKeysInOrder.removeAll();
-            groupColumnKeysInOrder.add(grid.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
+            groupColumnKeysInOrder.add(e.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
         });
 
         ListDataProvider<Integer> dataProvider = DataProvider.ofItems(1,2,3,4,5);
@@ -123,7 +123,7 @@ public class GridOrderColumnsPage extends VerticalLayout
 
         grid.addColumnReorderListener(e -> {
             groupColumnKeysInOrder.removeAll();
-            groupColumnKeysInOrder.add(grid.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
+            groupColumnKeysInOrder.add(e.getColumns().stream().map(Grid.Column::getKey).reduce(String::concat).orElse(""));
         });
 
         Button orderCol543210Button = new Button("Col 5 4 3 2 1 0",e -> {

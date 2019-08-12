@@ -21,11 +21,28 @@ import com.vaadin.flow.component.DomEvent;
 import com.vaadin.flow.component.EventData;
 import elemental.json.JsonValue;
 
+import java.util.List;
+
 @DomEvent("column-reorder")
 public class ColumnReorderEvent<T> extends ComponentEvent<Grid<T>> {
 
+    private List<Grid.Column<T>> columns;
+
     public ColumnReorderEvent(Grid<T> source, boolean fromClient) {
         super(source, fromClient);
+        columns = source.getColumns();
     }
 
+    public ColumnReorderEvent(Grid<T> source, boolean fromClient, List<Grid.Column<T>> columns) {
+        super(source, fromClient);
+        this.columns = columns;
+    }
+
+    public List<Grid.Column<T>> getColumns() {
+        return columns;
+    }
+
+    public void setColumns(List<Grid.Column<T>> columns) {
+        this.columns = columns;
+    }
 }

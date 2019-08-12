@@ -80,28 +80,6 @@ interface ColumnBase<T extends ColumnBase<T>> extends HasElement {
     }
 
     /**
-     * Gets this column's order.
-     *
-     * @return order of the column
-     */
-    @Synchronize(property = "_order", value = "_order-changed")
-    default int getOrder() {
-        return getElement().getProperty("_order", 0);
-    }
-
-    /**
-     * Sets the column order
-     *
-     * @param order new order of the column
-     * @return this column, for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    default T setOrder(int order) {
-        getElement().setProperty("_order", order);
-        return (T) this;
-    }
-
-    /**
      * Sets the column text align.
      * 
      * @param textAlign

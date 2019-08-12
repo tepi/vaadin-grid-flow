@@ -2617,7 +2617,7 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
     public List<Column<T>> getColumns() {
         List<Column<T>> ret = new ArrayList<>();
         getTopLevelColumns().forEach(column -> appendChildColumns(ret, column));
-        ret.sort(Comparator.comparingInt(ColumnBase::getOrder));
+        ret.sort(Comparator.comparingInt(AbstractColumn::getOrder));
         return Collections.unmodifiableList(ret);
     }
 
@@ -3692,26 +3692,76 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
      * @param columns
      */
     private void setColumnOrder(List<Column<T>> columns) {
-        if (columns == null || columns.isEmpty()){
+
+     /*
+     1st Solution:
+     USE setOrder from the column but _order is private
+     and it does not work if order = 0 (setColumnOrder + addColumn at the same time on the server side)
+*/
+       if (columns == null || columns.isEmpty()){
             // does nothing if nothing to reorder
             return;
         }
+
         // check if all the columns are in the same group
         List<Integer> columnsOrder = new ArrayList<>(columns.size());
+
         Component parent = columns.get(0).getParent().get();
         for (Column<T> column : columns) {
             if (!parent.equals(column.getParent().get())) {
                 throw new IllegalStateException("Cannot change the order of " +
                         "columns from different group");
             }
-            columnsOrder.add(column.getOrder());
+            // ugly, does not work very well
+            if (column.getOrder() != 0) {
+                columnsOrder.add(column.getOrder());
+            }
         }
         Collections.sort(columnsOrder);
 
         for (int i = 0; i < columns.size(); i++) {
-            columns.get(i).setOrder(columnsOrder.get(i));
+            if (i < columnsOrder.size()) {
+                // sort the column
+                columns.get(i).setOrder(columnsOrder.get(i));
+            } else {
+                // add the column at the end
+                parent.getElement().appendChild(columns.get(i).getElement());
+            }
         }
-        fireColumnReorderEvent(false);
+        // TODO need to generate the list of columns
+        fireColumnReorderEvent(false, getColumns());
+
+        /* 2nd solution: does not use setOrder
+        * Does not work if the columns are inside a group
+        * Does not work if all the columns are not there
+        * For example col1 col2 col3
+        * reorder col3-col1 ==> col2 col3 col1
+        *
+        *  */
+     /*   if (columns == null || columns.isEmpty()){
+            // does nothing if nothing to reorder
+            return;
+        }
+
+        // check if all the columns are in the same group
+        Component parent = columns.get(0).getParent().get();
+        for (Column<T> column : columns) {
+            if (!parent.equals(column.getParent().get())) {
+                throw new IllegalStateException("Cannot change the order of " +
+                        "columns from different group");
+            }
+        }
+
+        parent.getElement().appendChild(columns.stream().map(Column::getElement).toArray(Element[]::new));
+
+        getElement().executeJs("this._updateOrders(this._columnTree,null)");
+        // the column's _order will be set
+        // so the reorderEvent will be executed with the old columns order
+        // Maybe we can add columns in the right order
+        // But it should also be added on the client side
+        // if we don't reorder all the columns then it does not work
+        fireColumnReorderEvent(false, columns);*/
+
     }
 
     /**
@@ -3729,7 +3779,7 @@ public class Grid<T> extends Component implements HasDataProvider<T>, HasStyle,
                 .collect(Collectors.toList()));
     }
 
-    private void fireColumnReorderEvent(boolean userOriginated) {
-        fireEvent(new ColumnReorderEvent<>(this, userOriginated));
+    private void fireColumnReorderEvent(boolean userOriginated, List<Column<T>> columns) {
+        fireEvent(new ColumnReorderEvent<>(this, userOriginated, columns));
     }
 }
